@@ -3,8 +3,11 @@ import customtkinter
 import tkinter as tk
 import pymongo
 from tkinter import ttk
+from tkinter.ttk import *
 import tkinter.messagebox as messagebox
 from PIL import Image, ImageTk
+from tkinter import font as tkFont
+import customtkinter
 
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("blue")
@@ -54,10 +57,13 @@ class SelfLearningPlatform:
         window.destroy()
         LoginPage(self)
 
-    def login_to_menu(self, window):
+    def login_to_menu(self, window, username):
+        window.destroy()
+        Instructor_Landing_Page(username)
+
+    def menu_to_create(self, window):
         window.destroy()
         App()
-
     def menu_to_none(self, window):
         App().destroy()
 
@@ -83,23 +89,7 @@ class SelfLearningPlatform:
                 for user in user_list:
                     if user['username'] == username and user['password'] == password and user['role'] == role:
                         messagebox.showinfo('Message', "Login is successful")
-                        # question_bank = []
-                        # for question in question_data:
-                        #     choices = []
-                        #     question_text = html.unescape(question["question"])
-                        #     correct_answer = html.unescape(question["correct_answer"])
-                        #     incorrect_answers = question["incorrect_answers"]
-                        #     for ans in incorrect_answers:
-                        #         choices.append(html.unescape(ans))
-                        #     choices.append(correct_answer)
-                        #     shuffle(choices)
-                        #     new_question = Question(question_text, correct_answer, choices)
-                        #     question_bank.append(new_question)
-                        # quiz = QuizBrain(question_bank)
-                        # quiz_ui = QuizInterface(quiz)
-                        # quiz_ui
-                        self.login_to_menu(window)
-
+                        self.login_to_menu(window, username)
                         return
                 raise Exception("The input is invalid")  # Raise exception if no matching user is found
             else:
@@ -214,8 +204,80 @@ class LoginPage:
 
         self.window.mainloop()
 
+
+class Instructor_Landing_Page:
+    def __init__(self, username):
+        self.slp = SelfLearningPlatform()
+        self.username = username
+
+        self.window = tk.Tk()
+        self.window.title('Instructor Main Page')
+
+        # Get the screen width and height
+        screen_width = self.window.winfo_screenwidth()
+        screen_height = self.window.winfo_screenheight()
+
+        # Calculate the center position of the screen
+        center_x = screen_width // 2
+        center_y = screen_height // 2
+
+        #creating the font obj
+        font_obj = Font()
+
+        # Set the window size and positionasdas
+        self.window.geometry(f"{screen_width}x{screen_height - 75}+{center_x - screen_width // 2}+{center_y - screen_height // 2}")
+
+        self.window.resizable(False, False)
+
+        self.window.grid_columnconfigure(0, weight = 1)
+        self.window.grid_rowconfigure(0, weight = 1)
+
+        self.main_frame = customtkinter.CTkFrame(self.window, corner_radius=20, bg_color= 'grey')
+
+        self.main_frame.grid(row = 0, column = 0, padx=(20, 20), pady=(20, 20), sticky = 'nsew')
+
+        self.main_frame.grid_rowconfigure(1, weight = 1)
+        self.main_frame.grid_columnconfigure( (1,2), weight = 1)
+
+        # creating a label to show welcome users
+        self.welcome_label = tk.Label(self.main_frame, text = f"Welcome back to the system {self.username}", font = font_obj.get_font(20), bg='grey')
+        self.welcome_label.grid(row = 0, column = 0)
+
+        # retreiving images for the image buttons
+        self.add_image = Image.open('add_img.jpg')
+        self.add_image = self.add_image.resize((200,200))
+        self.resized_add_image = ImageTk.PhotoImage(self.add_image)
+
+        self.record_image = Image.open('record_img.png')
+        self.record_image = self.record_image.resize((200,200))
+        self.resized_record_image = ImageTk.PhotoImage(self.record_image)
+
+        # creating image buttons
+
+        self.add_button = tk.Button(self.main_frame, text = 'Create Courses', image=self.resized_add_image, compound= 'top', bg = 'grey', font=font_obj.get_font(36), command = lambda: self.slp.menu_to_create(self.window))
+        self.add_button.grid(row = 1, column = 1,padx=(40, 40), pady=(20, 20), sticky = 'e')
+        self.record_button = tk.Button(self.main_frame,  text = 'View Courses', image=self.resized_record_image, compound= 'top', bg = 'grey', font=font_obj.get_font(36))
+        self.record_button.grid(row=1, column=2,padx=(40, 40), pady=(20, 20), sticky = 'w')
+
+        # # creating labels for the buttons
+        # self.add_label = customtkinter.CTkLabel(self.main_frame, text="Create Course")
+        # self.add_label.grid(row=2, column=1, padx=(40, 40), pady=(20, 20), sticky = 'e')
+        # self.view_label = customtkinter.CTkLabel(self.main_frame, text="View Course")
+        # self.view_label.grid(row=2, column=2, padx=(40, 40), pady=(20, 20), sticky = 'w')
+
+        self.window.mainloop()
+
+
+class Font:
+    def get_font(self, size):
+        helv = tkFont.Font(family='Helvetica', size=size, weight='bold')
+        return helv
+
 if __name__ == '__main__':
     slp = SelfLearningPlatform()
     print(slp.get_curr_screen_geometry())
     LoginPage(slp)
+
+
+
 

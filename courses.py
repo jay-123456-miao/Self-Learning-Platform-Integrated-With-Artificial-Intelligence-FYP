@@ -85,17 +85,18 @@ class App(customtkinter.CTk):
         self.tabview.add("Subtopic 3")
 
         # Usage example
-        self.setup_tab_design(self.tabview.tab("Subtopic 1"), "Subtopic 1", self.pic1)
-        self.setup_tab_design(self.tabview.tab("Subtopic 2"), "Subtopic 2", self.pic2)
-        self.setup_tab_design(self.tabview.tab("Subtopic 3"), "Subtopic 3", self.pic3)
+        # Call the setup_tab_design function for each tab
+        self.setup_tab_design("Subtopic 1", self.pic1)
+        self.setup_tab_design("Subtopic 2", self.pic2)
+        self.setup_tab_design("Subtopic 3", self.pic3)
 
         # submit button, add button , create quiz
         self.submit_frame = customtkinter.CTkFrame(self, corner_radius= 0)
         self.submit_frame.grid(row= 3, column = 1, padx=(20, 20), pady=(20, 0), sticky="nsew")
         self.submit_frame.grid_columnconfigure((0,1,2), weight=1)
-        self.submit_button = customtkinter.CTkButton(self.submit_frame, text='Submit', command = lambda : self.menu_to_none(self))
+        self.submit_button = customtkinter.CTkButton(self.submit_frame, text='Submit', command = lambda : self.captureData())
         self.submit_button.grid(row=0, column=2, padx=20, pady=20)
-        self.add_button = customtkinter.CTkButton(self.submit_frame, text='Add', command = lambda :self.clear_content())
+        self.add_button = customtkinter.CTkButton(self.submit_frame, text='Add', command = lambda :self.clear_tab_contents())
         self.add_button.grid(row=0, column=1, padx=20, pady=20)
         self.create_quiz_button = customtkinter.CTkButton(self.submit_frame, text='Create Quiz', command = lambda : self.menu_to_none(self))
         self.create_quiz_button.grid(row=0, column=0, padx=20, pady=20)
@@ -109,7 +110,7 @@ class App(customtkinter.CTk):
         dialog = customtkinter.CTkInputDialog(text="Type in a number:", title="CTkInputDialog")
         print("CTkInputDialog:", dialog.get_input())
 
-    def change_appearance_mode_event(self, new_appearance_mode: str):
+    def inchange_appearance_mode_event(self, new_appearance_mode: str):
         customtkinter.set_appearance_mode(new_appearance_mode)
 
     def change_scaling_event(self, new_scaling: str):
@@ -140,43 +141,130 @@ class App(customtkinter.CTk):
         else:
             print("No file is Choosen !! Please choose a file.")
 
-    def setup_tab_design(self, tab, num, img):
-        # self.tabview.tab(num).grid_rowconfigure(3, weight=1)
-        self.tabview.tab(num).grid_columnconfigure(( 0, 1, 2, 3), weight=1)  # configure grid of individual tabs
-        # adding background image
+    def setup_subtopic1_design(self, tab, num, img):
+        self.tabview.tab(num).grid_columnconfigure((0, 1, 2, 3), weight=1)  # configure grid of individual tabs
 
-        self.subtopic_entry = customtkinter.CTkEntry(tab, placeholder_text="CTkEntry")
-        self.subtopic_entry.grid(row=0, column=0, columnspan = 3, padx=20, pady=(10, 10), sticky="we")
+        self.subtopic1_subtopic_entry = customtkinter.CTkEntry(tab, placeholder_text="CTkEntry")
+        self.subtopic1_subtopic_entry.grid(row=0, column=0, columnspan=3, padx=20, pady=(10, 10), sticky="we")
 
-        self.imgLabel1 = Label(tab, image= img)
-        self.imgLabel1.grid(row=1, column=0, sticky="ns")
+        self.subtopic1_imgLabel1 = Label(tab, image=img)
+        self.subtopic1_imgLabel1.grid(row=1, column=0, sticky="ns")
 
-        self.imgLabel2 = Label(tab, image= img)
-        self.imgLabel2.grid(row=1, column=1, sticky="ns")
+        self.subtopic1_imgLabel2 = Label(tab, image=img)
+        self.subtopic1_imgLabel2.grid(row=1, column=1, sticky="ns")
 
-        self.imgLabel3 = Label(tab, image= img)
-        self.imgLabel3.grid(row=1, column=2, sticky="ns")
+        self.subtopic1_imgLabel3 = Label(tab, image=img)
+        self.subtopic1_imgLabel3.grid(row=1, column=2, sticky="ns")
 
-        self.data_entry1 = customtkinter.CTkEntry(tab, placeholder_text="CTkEntry", )
-        self.data_entry1.grid(row=2, column=0, padx=20, pady=(10, 10), sticky="ns")
+        self.subtopic1_data_entry1 = customtkinter.CTkEntry(tab, placeholder_text="CTkEntry", )
+        self.subtopic1_data_entry1.grid(row=2, column=0, padx=20, pady=(10, 10), sticky="ns")
 
-        self.data_entry2 = customtkinter.CTkEntry(tab, placeholder_text="CTkEntry")
-        self.data_entry2.grid(row=2, column=1, padx=20, pady=(10, 10), sticky="ns")
+        self.subtopic1_data_entry2 = customtkinter.CTkEntry(tab, placeholder_text="CTkEntry")
+        self.subtopic1_data_entry2.grid(row=2, column=1, padx=20, pady=(10, 10), sticky="ns")
 
-        self. data_entry3 = customtkinter.CTkEntry(tab, placeholder_text="CTkEntry")
-        self.data_entry3.grid(row=2, column=2, padx=20, pady=(10, 10), sticky="ns")
+        self.subtopic1_data_entry3 = customtkinter.CTkEntry(tab, placeholder_text="CTkEntry")
+        self.subtopic1_data_entry3.grid(row=2, column=2, padx=20, pady=(10, 10), sticky="ns")
 
-        self.upload_button1 = customtkinter.CTkButton(tab,  text='Upload', command=lambda: self.imageUploader(self.imgLabel1))
-        self.upload_button1.grid(row=3, column=0, padx=20, pady=10,  sticky="ns")
+        self.subtopic1_upload_button1 = customtkinter.CTkButton(tab, text='Upload',
+                                                      command=lambda: self.imageUploader(self.subtopic1_imgLabel1))
+        self.subtopic1_upload_button1.grid(row=3, column=0, padx=20, pady=10, sticky="ns")
 
-        self.upload_button2 = customtkinter.CTkButton(tab, text='Upload', command=lambda: self.imageUploader(self.imgLabel2))
-        self.upload_button2.grid(row=3, column=1, padx=20, pady=10, sticky="ns")
+        self.subtopic1_upload_button2 = customtkinter.CTkButton(tab, text='Upload',
+                                                      command=lambda: self.imageUploader(self.subtopic1_imgLabel2))
+        self.subtopic1_upload_button2.grid(row=3, column=1, padx=20, pady=10, sticky="ns")
 
-        self.upload_button3 = customtkinter.CTkButton(tab, text='Upload', command=lambda: self.imageUploader(self.imgLabel3))
-        self.upload_button3.grid(row=3, column=2, padx=20, pady=10, sticky="ns")
+        self.subtopic1_upload_button3 = customtkinter.CTkButton(tab, text='Upload',
+                                                      command=lambda: self.imageUploader(self.subtopic1_imgLabel3))
+        self.subtopic1_upload_button3.grid(row=3, column=2, padx=20, pady=10, sticky="ns")
 
-        self.textbox = customtkinter.CTkTextbox(tab)
-        self.textbox.grid(row=4, column=0, columnspan=3, padx=(20, 20), pady=(20, 20), sticky="nsew")
+        self.subtopic1_textbox = customtkinter.CTkTextbox(tab)
+        self.subtopic1_textbox.grid(row=4, column=0, columnspan=3, padx=(20, 20), pady=(20, 20), sticky="nsew")
+
+    def setup_subtopic2_design(self, tab, num, img):
+        self.tabview.tab(num).grid_columnconfigure((0, 1, 2, 3), weight=1)  # configure grid of individual tabs
+
+        self.subtopic2_subtopic_entry = customtkinter.CTkEntry(tab, placeholder_text="CTkEntry")
+        self.subtopic2_subtopic_entry.grid(row=0, column=0, columnspan=3, padx=20, pady=(10, 10), sticky="we")
+
+        self.subtopic2_imgLabel1 = Label(tab, image=img)
+        self.subtopic2_imgLabel1.grid(row=1, column=0, sticky="ns")
+
+        self.subtopic2_imgLabel2 = Label(tab, image=img)
+        self.subtopic2_imgLabel2.grid(row=1, column=1, sticky="ns")
+
+        self.subtopic2_imgLabel3 = Label(tab, image=img)
+        self.subtopic2_imgLabel3.grid(row=1, column=2, sticky="ns")
+
+        self.subtopic2_data_entry1 = customtkinter.CTkEntry(tab, placeholder_text="CTkEntry", )
+        self.subtopic2_data_entry1.grid(row=2, column=0, padx=20, pady=(10, 10), sticky="ns")
+
+        self.subtopic2_data_entry2 = customtkinter.CTkEntry(tab, placeholder_text="CTkEntry")
+        self.subtopic2_data_entry2.grid(row=2, column=1, padx=20, pady=(10, 10), sticky="ns")
+
+        self.subtopic2_data_entry3 = customtkinter.CTkEntry(tab, placeholder_text="CTkEntry")
+        self.subtopic2_data_entry3.grid(row=2, column=2, padx=20, pady=(10, 10), sticky="ns")
+
+        self.subtopic2_upload_button1 = customtkinter.CTkButton(tab, text='Upload',
+                                                      command=lambda: self.imageUploader(self.subtopic2_imgLabel1))
+        self.subtopic2_upload_button1.grid(row=3, column=0, padx=20, pady=10, sticky="ns")
+
+        self.subtopic2_upload_button2 = customtkinter.CTkButton(tab, text='Upload',
+                                                      command=lambda: self.imageUploader(self.subtopic2_imgLabel2))
+        self.subtopic2_upload_button2.grid(row=3, column=1, padx=20, pady=10, sticky="ns")
+
+        self.subtopic2_upload_button3 = customtkinter.CTkButton(tab, text='Upload',
+                                                      command=lambda: self.imageUploader(self.subtopic2_imgLabel3))
+        self.subtopic2_upload_button3.grid(row=3, column=2, padx=20, pady=10, sticky="ns")
+
+        self.subtopic2_textbox = customtkinter.CTkTextbox(tab)
+        self.subtopic2_textbox.grid(row=4, column=0, columnspan=3, padx=(20, 20), pady=(20, 20), sticky="nsew")
+
+    def setup_subtopic3_design(self, tab, num, img):
+        self.tabview.tab(num).grid_columnconfigure((0, 1, 2, 3), weight=1)  # configure grid of individual tabs
+
+        self.subtopic3_subtopic_entry = customtkinter.CTkEntry(tab, placeholder_text="CTkEntry")
+        self.subtopic3_subtopic_entry.grid(row=0, column=0, columnspan=3, padx=20, pady=(10, 10), sticky="we")
+
+        self.subtopic3_imgLabel1 = Label(tab, image=img)
+        self.subtopic3_imgLabel1.grid(row=1, column=0, sticky="ns")
+
+        self.subtopic3_imgLabel2 = Label(tab, image=img)
+        self.subtopic3_imgLabel2.grid(row=1, column=1, sticky="ns")
+
+        self.subtopic3_imgLabel3 = Label(tab, image=img)
+        self.subtopic3_imgLabel3.grid(row=1, column=2, sticky="ns")
+
+        self.subtopic3_data_entry1 = customtkinter.CTkEntry(tab, placeholder_text="CTkEntry", )
+        self.subtopic3_data_entry1.grid(row=2, column=0, padx=20, pady=(10, 10), sticky="ns")
+
+        self.subtopic3_data_entry2 = customtkinter.CTkEntry(tab, placeholder_text="CTkEntry")
+        self.subtopic3_data_entry2.grid(row=2, column=1, padx=20, pady=(10, 10), sticky="ns")
+
+        self.subtopic3_data_entry3 = customtkinter.CTkEntry(tab, placeholder_text="CTkEntry")
+        self.subtopic3_data_entry3.grid(row=2, column=2, padx=20, pady=(10, 10), sticky="ns")
+
+        self.subtopic3_upload_button1 = customtkinter.CTkButton(tab, text='Upload',
+                                                      command=lambda: self.imageUploader(self.subtopic3_imgLabel1))
+        self.subtopic3_upload_button1.grid(row=3, column=0, padx=20, pady=10, sticky="ns")
+
+        self.subtopic3_upload_button2 = customtkinter.CTkButton(tab, text='Upload',
+                                                      command=lambda: self.imageUploader(self.subtopic3_imgLabel2))
+        self.subtopic3_upload_button2.grid(row=3, column=1, padx=20, pady=10, sticky="ns")
+
+        self.subtopic3_upload_button3 = customtkinter.CTkButton(tab, text='Upload',
+                                                      command=lambda: self.imageUploader(self.subtopic3_imgLabel3))
+        self.subtopic3_upload_button3.grid(row=3, column=2, padx=20, pady=10, sticky="ns")
+
+        self.subtopic3_textbox = customtkinter.CTkTextbox(tab)
+        self.subtopic3_textbox.grid(row=4, column=0, columnspan=3, padx=(20, 20), pady=(20, 20), sticky="nsew")
+
+    def setup_tab_design(self, tab_name, img):
+        if tab_name == "Subtopic 1":
+            self.setup_subtopic1_design(self.tabview.tab(tab_name), tab_name, img)
+        elif tab_name == "Subtopic 2":
+            self.setup_subtopic2_design(self.tabview.tab(tab_name), tab_name, img)
+        elif tab_name == "Subtopic 3":
+            self.setup_subtopic3_design(self.tabview.tab(tab_name), tab_name, img)
 
     def captureData(self):
         # Retrieve data from each input field in all tabs
@@ -200,36 +288,22 @@ class App(customtkinter.CTk):
         for item in data:
             print(item)
 
-    def clear_content(self):
-        # Clear the entry widgets
-        self.title_entry.delete(0, 'end')
-        self.author_entry.delete(0, 'end')
-        self.date_entry.delete(0, 'end')
 
-        # Clear the textbox widget
-        self.textbox.delete('1.0', 'end')
+    def clear_tab_contents(self):
 
-        self.clear_tab_contents("Subtopic 1")
-        self.clear_tab_contents("Subtopic 2")
-        self.clear_tab_contents("Subtopic 3")
+        for tab_num in ["Subtopic 1", "Subtopic 2", "Subtopic 3"]:
+            tab = self.tabview.tab(tab_num)
+            subtopic_entry = tab.grid_slaves(row=0, column=0)[0]
+            data_entry1 = tab.grid_slaves(row=2, column=0)[0]
+            data_entry2 = tab.grid_slaves(row=2, column=1)[0]
+            data_entry3 = tab.grid_slaves(row=2, column=2)[0]
+            textbox = tab.grid_slaves(row=4, column=0)[0]
 
-    def clear_tab_contents(self, tab_name):
-        # Get the current tab
-        current_tab = self.tabview.tab(tab_name)
-
-        # Find the widgets in the current tab
-        subtopic_entry = current_tab.nametowidget("subtopic_entry")
-        data_entry1 = current_tab.nametowidget("data_entry1")
-        data_entry2 = current_tab.nametowidget("data_entry2")
-        data_entry3 = current_tab.nametowidget("data_entry3")
-        textbox = current_tab.nametowidget("textbox")
-
-        # Clear the contents of the widgets
-        subtopic_entry.delete(0, tk.END)
-        data_entry1.delete(0, tk.END)
-        data_entry2.delete(0, tk.END)
-        data_entry3.delete(0, tk.END)
-        textbox.delete('1.0', tk.END)
+            subtopic_entry.delete(0, "end")
+            data_entry1.delete(0, "end")
+            data_entry2.delete(0, "end")
+            data_entry3.delete(0, "end")
+            textbox.delete("1.0", "end-1c")
 
 
     def menu_to_none(self, window):
