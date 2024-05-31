@@ -4,6 +4,7 @@ from tkinter import Label
 from tkinter import filedialog
 from PIL import Image, ImageTk
 import customtkinter
+from quiz import Test
 
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
@@ -11,6 +12,7 @@ customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "gre
 
 class App(customtkinter.CTk):
     def __init__(self):
+        self.window = customtkinter.CTk()
         super().__init__()
 
         img = Image.open('bg.jpg')
@@ -22,35 +24,37 @@ class App(customtkinter.CTk):
         self.pic3 = ImageTk.PhotoImage(img_1)
 
         # Get the screen width and height
-        screen_width = self.winfo_screenwidth()
-        screen_height = self.winfo_screenheight()
+        screen_width = self.window.winfo_screenwidth()
+        screen_height = self.window.winfo_screenheight()
 
         # Calculate the center position of the screen
         center_x = screen_width // 2
         center_y = screen_height // 2
 
         # Set the window size and position
-        self.geometry(f"{screen_width}x{screen_height - 75}+{center_x - screen_width // 2}+{center_y - screen_height // 2}")
+        self.window.geometry(f"{screen_width}x{screen_height - 75}+{center_x - screen_width // 2}+{center_y - screen_height // 2}")
 
         # configure grid layout (4x4)
-        self.grid_columnconfigure(1, weight=1)
+        self.window.grid_columnconfigure(1, weight=1)
         # self.grid_columnconfigure((2, 3), weight=0)
-        self.grid_rowconfigure((0,1), weight = 0 )
-        self.grid_rowconfigure((2,3), weight=1)
+        self.window.grid_rowconfigure((0,1), weight = 0 )
+        self.window.grid_rowconfigure((2,3), weight=1)
 
         # create sidebar frame with widgets
-        self.sidebar_frame = customtkinter.CTkFrame(self, width=140, corner_radius=0)
+        self.sidebar_frame = customtkinter.CTkFrame(self.window, width=140, corner_radius=0)
         self.sidebar_frame.grid(row=0, column=0, rowspan=5, sticky="nsew")
         self.sidebar_frame.grid_rowconfigure(4, weight=1)
         self.logo_label = customtkinter.CTkLabel(self.sidebar_frame, text="CustomTkinter", font=customtkinter.CTkFont(size=20, weight="bold"))
         self.logo_label.grid(row=0, column=0, padx=20, pady=(20, 10))
         self.appearance_mode_label = customtkinter.CTkLabel(self.sidebar_frame, text="Appearance Mode:", anchor="w")
         self.appearance_mode_label.grid(row=5, column=0, padx=20, pady=(10, 0))
-        self.appearance_mode_optionemenu = customtkinter.CTkOptionMenu(self.sidebar_frame, values=["Light", "Dark", "System"],                                                                       command=self.change_appearance_mode_event)
+        self.appearance_mode_optionemenu = customtkinter.CTkOptionMenu(self.sidebar_frame,
+                                                                       values=["Light", "Dark", "System"],
+                                                                       command=self.change_appearance_mode_event)
         self.appearance_mode_optionemenu.grid(row=6, column=0, padx=20, pady=(10, 10))
 
         # create title, Author, Date:
-        self.title_frame = customtkinter.CTkFrame(self, corner_radius= 0 )
+        self.title_frame = customtkinter.CTkFrame(self.window, corner_radius= 0 )
         self.title_frame.grid(row=0, column=1, padx=(20, 20), pady=(20, 0), sticky="nsew")
         self.title_frame.grid_columnconfigure(0,weight =0)
         self.title_frame.grid_columnconfigure(1,weight= 1)
@@ -69,7 +73,7 @@ class App(customtkinter.CTk):
         self.date_entry.grid(row = 2, column = 1, padx=20, pady=(10, 10), sticky="we")
 
         # create an abstract frame
-        self.abtract_frame = customtkinter.CTkFrame(self, corner_radius= 0)
+        self.abtract_frame = customtkinter.CTkFrame(self.window, corner_radius= 0)
         self.abtract_frame.grid(row=1, column=1, padx=(20, 20), pady=(20, 0), sticky="nsew")
         self.abtract_frame.grid_columnconfigure(0, weight = 1)
         self.abtract_label = customtkinter.CTkLabel(self.abtract_frame, text="Abtract:")
@@ -78,7 +82,7 @@ class App(customtkinter.CTk):
         self.textbox.grid(row=1, column=0, padx=(20, 20), pady=(20, 20), sticky="nsew")
 
         # create tabview
-        self.tabview = customtkinter.CTkTabview(self)
+        self.tabview = customtkinter.CTkTabview(self.window)
         self.tabview.grid(row=2, column=1, padx=(20, 20), pady=(0, 0), sticky="nsew")
         self.tabview.add("Subtopic 1")
         self.tabview.add("Subtopic 2")
@@ -91,26 +95,26 @@ class App(customtkinter.CTk):
         self.setup_tab_design("Subtopic 3", self.pic3)
 
         # submit button, add button , create quiz
-        self.submit_frame = customtkinter.CTkFrame(self, corner_radius= 0)
+        self.submit_frame = customtkinter.CTkFrame(self.window, corner_radius= 0)
         self.submit_frame.grid(row= 3, column = 1, padx=(20, 20), pady=(20, 0), sticky="nsew")
         self.submit_frame.grid_columnconfigure((0,1,2), weight=1)
         self.submit_button = customtkinter.CTkButton(self.submit_frame, text='Submit', command = lambda : self.captureData())
         self.submit_button.grid(row=0, column=2, padx=20, pady=20)
         self.add_button = customtkinter.CTkButton(self.submit_frame, text='Add', command = lambda :self.clear_tab_contents())
         self.add_button.grid(row=0, column=1, padx=20, pady=20)
-        self.create_quiz_button = customtkinter.CTkButton(self.submit_frame, text='Create Quiz', command = lambda : self.menu_to_none(self))
+        self.create_quiz_button = customtkinter.CTkButton(self.submit_frame, text='Create Quiz', command = lambda : self.menu_to_none(self.window))
         self.create_quiz_button.grid(row=0, column=0, padx=20, pady=20)
 
         # # set default values
         self.appearance_mode_optionemenu.set("Dark")
 
-        self.mainloop()
+        self.window.mainloop()
 
     def open_input_dialog_event(self):
         dialog = customtkinter.CTkInputDialog(text="Type in a number:", title="CTkInputDialog")
         print("CTkInputDialog:", dialog.get_input())
 
-    def inchange_appearance_mode_event(self, new_appearance_mode: str):
+    def change_appearance_mode_event(self, new_appearance_mode: str):
         customtkinter.set_appearance_mode(new_appearance_mode)
 
     def change_scaling_event(self, new_scaling: str):
@@ -308,6 +312,7 @@ class App(customtkinter.CTk):
 
     def menu_to_none(self, window):
         window.destroy()
+        Test()
 
     def add_new_topic(self, window):
         window.destroy()

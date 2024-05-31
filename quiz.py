@@ -5,28 +5,29 @@ from tkinter import filedialog
 from PIL import Image, ImageTk
 import customtkinter
 
-class Test:
-
+class Test(customtkinter.CTk):
     def __init__(self):
+        self.window = customtkinter.CTk()
+        super().__init__()
 
 
-        self.window = tk.Tk()
-        self.window.title("Test Page")
+
         # Get the screen width and height
         screen_width = self.window.winfo_screenwidth()
         screen_height = self.window.winfo_screenheight()
-
+        print(screen_width)
+        print(screen_height)
         # Calculate the center position of the screen
         center_x = screen_width // 2
         center_y = screen_height // 2
-
         # Set the window size and position
-        self.window.geometry(f"{screen_width}x{screen_height - 75}+{center_x - screen_width // 2}+{center_y - screen_height // 2}")
-
+        # Set the window size and position
+        self.window.geometry(
+            f"{screen_width}x{screen_height - 75}+{center_x - screen_width // 2}+{center_y - screen_height // 2}")
+        self.window.title("Test Page")
         self.window.columnconfigure(1, weight = 1)
         self.title_label = tk.Label(self.window, text = 'Test Page', bg = 'green', fg = 'white', font = ("ariel", 20, "bold"))
         self.title_label.grid(row = 0, column = 0, columnspan = 2 , sticky = 'we')
-
         self.question_label = tk.Label(self.window, text='Enter Your Question Here: ', fg='black', font=("ariel", 20, "bold"))
         self.question_label.grid(row=1, column=0, sticky='we')
         self.textbox = customtkinter.CTkTextbox(self.window ,height= 100)
@@ -36,17 +37,13 @@ class Test:
         # value = self.input_type.get()
         self.choice_label = tk.Label(self.window, text='Question Choice: ', fg='black', font=("ariel", 20, "bold"))
         self.choice_label.grid(row=3, column=0, sticky='we')
-
         self.user_input_choice = customtkinter.CTkOptionMenu(self.window, values=["Multiple Choice", "Short Answer"],
-                                                             variable = self.input_type,
-                                                             command= self.create_input_widget)
-
+        variable = self.input_type,
+        command= self.create_input_widget)
         self.user_input_choice.grid(row=3, column=1, padx=20, pady=(10, 10))
-
         #create radio buttons frame (four entries because radio button have four choices)
         self.radiobutton_frame = customtkinter.CTkFrame(self.window)
-        # self.radiobutton_frame.grid(row=4, column=0, columnspan = 2,  padx=(20, 20), pady=(20, 0), sticky="nsew")
-
+        # self.radiobutton_frame.grid(row=4, column=0, columnspan = 2, padx=(20, 20), pady=(20, 0), sticky="nsew")
         self.radiobutton_frame.grid_columnconfigure(1, weight=1)
         self.radio_label_1 = tk.Label(self.radiobutton_frame, text='Choice 1: ', fg='black', font=("ariel", 20, "bold"))
         self.radio_label_1.grid(row = 0, column=0)
@@ -64,34 +61,44 @@ class Test:
         self.radio_label_4.grid(row = 3, column=0)
         self.radio_choice_4 = customtkinter.CTkEntry(self.radiobutton_frame , placeholder_text="Choice 4")
         self.radio_choice_4.grid(row= 3, column=1, columnspan=2, padx=(20, 0), pady=(20, 20), sticky="ew")
-
         self.answer_label = tk.Label(self.radiobutton_frame, text='Answer: ', fg='black', font=("ariel", 20, "bold"))
         self.answer_label.grid(row = 4, column=0)
         self.answer = customtkinter.CTkTextbox(self.radiobutton_frame, height=100)
         self.answer.grid(row=4, column=1, columnspan=2, padx=(20, 20), pady=(40, 40), sticky="we")
-
         #create entry frame (four entries because radio button have four choices)
         self.answer_frame = customtkinter.CTkFrame(self.window)
-        # self.answer_frame.grid(row=4, column=0, columnspan = 2,  padx=(20, 20), pady=(20, 0), sticky="nsew")
+        # self.answer_frame.grid(row=4, column=0, columnspan = 2, padx=(20, 20), pady=(20, 0), sticky="nsew")
         self.answer_frame.grid_columnconfigure(1, weight=1)
         self.entry_answer_label = tk.Label(self.answer_frame, text='Answer: ', fg='black', font=("ariel", 20, "bold"))
         self.entry_answer_label.grid(row = 0, column=0)
         self.entry_answer = customtkinter.CTkTextbox(self.answer_frame, height=100)
         self.entry_answer.grid(row=0, column=1, columnspan=2, padx=(20, 20), pady=(40, 40), sticky="we")
-
+        #create the add new page button
+        self.bottom_frame = customtkinter.CTkFrame(self.window)
+        self.add_quiz_button = customtkinter.CTkButton(self.bottom_frame, text='Add New Page', command =self.add_new_page)
+        self.add_quiz_button.grid(row=0, column=0, padx=(1000, 100), pady=20, sticky = 'e')
+        self.finish_quiz_button = customtkinter.CTkButton(self.bottom_frame, text='Finish')
+        self.finish_quiz_button.grid(row=0, column=1, padx=20, pady=20, sticky = 'e')
         self.window.mainloop()
 
+    # def __del__(self):
+    #     # Perform cleanup here
+    #     if hasattr(self, 'window') and self.window is not None:
+    #         self.window.destroy()
 
+    def add_new_page(self):
+        self.window.withdraw()
+        self.window.quit()
+        Test()
     def create_input_widget(self, user_input):
         if user_input == "Short Answer":
             self.answer_frame.grid(row=4, column=0, columnspan=2, padx=(20, 20), pady=(20, 0), sticky="nsew")
             self.radiobutton_frame.grid_forget()
+            self.bottom_frame.grid(row=5, column=1, padx=(20, 20), pady=(20, 0), sticky="nsew")
         else:
             self.answer_frame.grid_forget()
             self.radiobutton_frame.grid(row=4, column=0, columnspan=2, padx=(20, 20), pady=(20, 0), sticky="nsew")
+            self.bottom_frame.grid(row=5, column=1, padx=(20, 20), pady=(20, 0), sticky="nsew")
 
 
-
-
-
-Test()
+# Test()
