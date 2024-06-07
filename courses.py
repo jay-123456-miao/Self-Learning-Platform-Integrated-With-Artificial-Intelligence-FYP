@@ -1,24 +1,29 @@
 import tkinter as tk
-import tkinter.messagebox
+from Database import *
 from tkinter import Label
 from tkinter import filedialog
 from PIL import Image, ImageTk
 import customtkinter
 from quiz import Test
+from main import Instructor_Landing_Page
+import tkinter.messagebox as messagebox
 
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
 
 
 class App(customtkinter.CTk):
-    def __init__(self):
+    def __init__(self,slp, course, ins):
+        self.slp = slp
+        self.course_info = course
         self.window = customtkinter.CTk()
         super().__init__()
-
+        self.ins = ins
+        self.username = ins.get_username()
         img = Image.open('bg.jpg')
 
         img_1 = img.resize((400, 150))
-
+        self.page_number = 1
         self.pic1 = ImageTk.PhotoImage(img_1)
         self.pic2 = ImageTk.PhotoImage(img_1)
         self.pic3 = ImageTk.PhotoImage(img_1)
@@ -67,10 +72,10 @@ class App(customtkinter.CTk):
         self.author_label.grid(row = 1, column = 0, padx=20, pady=(10, 0), sticky="w")
         self.author_entry = customtkinter.CTkEntry(self.title_frame, placeholder_text="CTkEntry")
         self.author_entry.grid(row = 1, column = 1, padx=20, pady=(10, 0), sticky="we")
-        self.date_label = customtkinter.CTkLabel(self.title_frame, text="Date:")
-        self.date_label.grid(row = 2, column = 0, padx=20, pady=(10, 0), sticky="w")
-        self.date_entry = customtkinter.CTkEntry(self.title_frame, placeholder_text="CTkEntry")
-        self.date_entry.grid(row = 2, column = 1, padx=20, pady=(10, 10), sticky="we")
+        # self.date_label = customtkinter.CTkLabel(self.title_frame, text="Date:")
+        # self.date_label.grid(row = 2, column = 0, padx=20, pady=(10, 0), sticky="w")
+        # self.date_entry = customtkinter.CTkEntry(self.title_frame, placeholder_text="CTkEntry")
+        # self.date_entry.grid(row = 2, column = 1, padx=20, pady=(10, 10), sticky="we")
 
         # create an abstract frame
         self.abtract_frame = customtkinter.CTkFrame(self.window, corner_radius= 0)
@@ -78,8 +83,8 @@ class App(customtkinter.CTk):
         self.abtract_frame.grid_columnconfigure(0, weight = 1)
         self.abtract_label = customtkinter.CTkLabel(self.abtract_frame, text="Abtract:")
         self.abtract_label.grid(row=0, column=0, padx=20, pady=(10, 0), sticky="w")
-        self.textbox = customtkinter.CTkTextbox(self.abtract_frame ,height= 100)
-        self.textbox.grid(row=1, column=0, padx=(20, 20), pady=(20, 20), sticky="nsew")
+        self.abstract_textbox = customtkinter.CTkTextbox(self.abtract_frame ,height= 100)
+        self.abstract_textbox.grid(row=1, column=0, padx=(20, 20), pady=(20, 20), sticky="nsew")
 
         # create tabview
         self.tabview = customtkinter.CTkTabview(self.window)
@@ -98,7 +103,7 @@ class App(customtkinter.CTk):
         self.submit_frame = customtkinter.CTkFrame(self.window, corner_radius= 0)
         self.submit_frame.grid(row= 3, column = 1, padx=(20, 20), pady=(20, 0), sticky="nsew")
         self.submit_frame.grid_columnconfigure((0,1,2), weight=1)
-        self.submit_button = customtkinter.CTkButton(self.submit_frame, text='Submit', command = lambda : self.captureData())
+        self.submit_button = customtkinter.CTkButton(self.submit_frame, text='Submit', command = lambda : self.captureData(self.course_info))
         self.submit_button.grid(row=0, column=2, padx=20, pady=20)
         self.add_button = customtkinter.CTkButton(self.submit_frame, text='Add', command = lambda :self.clear_tab_contents())
         self.add_button.grid(row=0, column=1, padx=20, pady=20)
@@ -270,7 +275,15 @@ class App(customtkinter.CTk):
         elif tab_name == "Subtopic 3":
             self.setup_subtopic3_design(self.tabview.tab(tab_name), tab_name, img)
 
-    def captureData(self):
+    def captureData(self, course_info):
+        title_entry = self.title_entry.get()
+        author_entry = self.author_entry.get()
+        # date_entry = self.date_entry.get()
+        abstract_entry = self.abstract_textbox.get("1.0", "end-1c")
+        print(title_entry)
+        print(author_entry)
+        # print(date_entry)
+        print(abstract_entry)
         # Retrieve data from each input field in all tabs
         data = []
         for tab_num in ["Subtopic 1", "Subtopic 2", "Subtopic 3"]:
@@ -288,12 +301,39 @@ class App(customtkinter.CTk):
             text = textbox.get("1.0", "end-1c")
 
             data.append((subtopic, entry1, entry2, entry3, text))
+        tabview1_tuple = data[0]
+        tabview2_tuple = data[1]
+        tabview3_tuple = data[2]
 
-        for item in data:
-            print(item)
+
+        tabview1_subtopic_entry = tabview1_tuple[0]
+        tabview1_data_entry1 = tabview1_tuple[1]
+        tabview1_data_entry2 = tabview1_tuple[2]
+        tabview1_data_entry3 = tabview1_tuple[3]
+        tabview1_textbox = tabview1_tuple[4]
+        tabview2_subtopic_entry = tabview2_tuple[0]
+        tabview2_data_entry1 = tabview2_tuple[1]
+        tabview2_data_entry2 = tabview2_tuple[2]
+        tabview2_data_entry3 = tabview2_tuple[3]
+        tabview2_textbox = tabview2_tuple[4]
+        tabview3_subtopic_entry = tabview3_tuple[0]
+        tabview3_data_entry1 = tabview3_tuple[1]
+        tabview3_data_entry2 = tabview3_tuple[2]
+        tabview3_data_entry3 = tabview3_tuple[3]
+        tabview3_textbox = tabview3_tuple[4]
+        course_page = Course_page(self.page_number, title_entry, author_entry, abstract_entry, tabview1_subtopic_entry, tabview1_data_entry1,  tabview1_data_entry2, tabview1_data_entry3, tabview1_textbox,
+                                  tabview2_subtopic_entry, tabview2_data_entry1, tabview2_data_entry2, tabview2_data_entry3, tabview2_textbox, tabview3_subtopic_entry, tabview3_data_entry1,
+                                  tabview3_data_entry2, tabview3_data_entry3, tabview3_textbox, self.course_info)
+        course_page.create_course_page_info()
+        messagebox.showinfo('Message', "Course Added Successfully")
+        Instructor_Landing_Page(self.slp, self.username, self.ins)
+
+
+
 
 
     def clear_tab_contents(self):
+
 
         for tab_num in ["Subtopic 1", "Subtopic 2", "Subtopic 3"]:
             tab = self.tabview.tab(tab_num)
