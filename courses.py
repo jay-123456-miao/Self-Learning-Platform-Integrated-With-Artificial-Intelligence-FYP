@@ -115,19 +115,10 @@ class App(customtkinter.CTk):
 
         self.window.mainloop()
 
-    def open_input_dialog_event(self):
-        dialog = customtkinter.CTkInputDialog(text="Type in a number:", title="CTkInputDialog")
-        print("CTkInputDialog:", dialog.get_input())
 
     def change_appearance_mode_event(self, new_appearance_mode: str):
         customtkinter.set_appearance_mode(new_appearance_mode)
 
-    def change_scaling_event(self, new_scaling: str):
-        new_scaling_float = int(new_scaling.replace("%", "")) / 100
-        customtkinter.set_widget_scaling(new_scaling_float)
-
-    def sidebar_button_event(self):
-        print("sidebar_button click")
 
     # image uploader function
     def imageUploader(self, lbl):
@@ -321,15 +312,32 @@ class App(customtkinter.CTk):
         tabview3_data_entry2 = tabview3_tuple[2]
         tabview3_data_entry3 = tabview3_tuple[3]
         tabview3_textbox = tabview3_tuple[4]
+        entry_list = [
+            title_entry,
+            author_entry,
+            abstract_entry,
+            tabview1_subtopic_entry,
+            tabview1_data_entry1,
+            tabview1_data_entry2,
+            tabview1_data_entry3,
+            tabview1_textbox,
+            tabview2_subtopic_entry,
+            tabview2_data_entry1,
+            tabview2_data_entry2,
+            tabview2_data_entry3,
+            tabview2_textbox,
+            tabview3_subtopic_entry,
+            tabview3_data_entry1,
+            tabview3_data_entry2,
+            tabview3_data_entry3,
+            tabview3_textbox
+        ]
         course_page = Course_page(self.page_number, title_entry, author_entry, abstract_entry, tabview1_subtopic_entry, tabview1_data_entry1,  tabview1_data_entry2, tabview1_data_entry3, tabview1_textbox,
                                   tabview2_subtopic_entry, tabview2_data_entry1, tabview2_data_entry2, tabview2_data_entry3, tabview2_textbox, tabview3_subtopic_entry, tabview3_data_entry1,
                                   tabview3_data_entry2, tabview3_data_entry3, tabview3_textbox, self.course_info)
         course_page.create_course_page_info()
         messagebox.showinfo('Message', "Course Added Successfully")
         Instructor_Landing_Page(self.slp, self.username, self.ins)
-
-
-
 
 
     def clear_tab_contents(self):

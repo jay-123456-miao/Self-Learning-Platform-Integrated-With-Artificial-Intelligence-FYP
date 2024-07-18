@@ -1,55 +1,22 @@
 import tkinter as tk
-from tkinter.ttk import Combobox
+import time
+
+def countdown(duration):
+    mins, secs = divmod(duration, 60)
+    timer = '{:02d}:{:02d}'.format(mins, secs)
+    countdown_label.config(text=timer)
+    if duration > 0:
+        countdown_label.after(1000, lambda: countdown(duration - 1))
+    else:
+        countdown_label.config(text="Time is up!")
 
 root = tk.Tk()
+root.title("Countdown Timer")
 
-# Variable to store the user's choice
-input_type = tk.StringVar(value="entry")
+countdown_label = tk.Label(root, font=("Helvetica", 48))
+countdown_label.pack(pady=20)
 
-# Variable to store the selected radio button value
-selected_value = tk.StringVar()
-
-def create_input_widget(*args):
-    if input_type.get() == "entry":
-        # Create an entry widget
-        entry_widget.pack()
-        radio_buttons_frame.pack_forget()
-        # Clear the selected radio button value
-        selected_value.set("")
-    else:
-        # Create radio buttons
-        entry_widget.pack_forget()
-        radio_buttons_frame.pack()
-        # Set the selected radio button value to the current value in the entry
-        selected_value.set(entry_widget.get())
-
-def get_input_value():
-    if input_type.get() == "entry":
-        # Get the value from the entry widget
-        print("Input value:", entry_widget.get())
-    else:
-        # Get the value from the selected radio button
-        print("Selected value:", selected_value.get())
-
-# Create the radio buttons
-radio_buttons_frame = tk.Frame(root)
-radio_button_1 = tk.Radiobutton(radio_buttons_frame, text="Option 1", variable=selected_value, value="option1")
-radio_button_2 = tk.Radiobutton(radio_buttons_frame, text="Option 2", variable=selected_value, value="option2")
-radio_button_1.pack(side=tk.LEFT)
-radio_button_2.pack(side=tk.LEFT)
-
-# Create the entry widget
-entry_widget = tk.Entry(root, textvariable=selected_value)
-
-# Create the combobox
-input_type_combobox = Combobox(root, textvariable=input_type, values=["entry", "radio"])
-input_type_combobox.pack()
-input_type_combobox.bind("<<ComboboxSelected>>", create_input_widget)
-
-# Create a button to get the input value
-get_value_button = tk.Button(root, text="Get Input Value", command=get_input_value)
-get_value_button.pack()
-
-create_input_widget()  # Initial creation of the input widget
+start_button = tk.Button(root, text="Start Countdown", command=lambda: countdown(20))
+start_button.pack(pady=10)
 
 root.mainloop()

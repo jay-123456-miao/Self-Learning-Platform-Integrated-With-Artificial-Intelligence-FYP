@@ -1,5 +1,10 @@
 import mysql.connector
 from mysql.connector import Error
+from tkinter import filedialog
+from PIL import Image, ImageTk
+import tkinter as tk
+from tkinter import Label
+
 
 class Database:
     def __init__(self):
@@ -42,10 +47,49 @@ class Database:
         except Error as err:
             print(f"Error: '{err}'")
 
-class Instructor:
+    def read_query_not_based_on_value(self, query):
+        cursor = self.__connection.cursor()
+        result = None
+        try:
+            cursor.execute(query)
+            result = cursor.fetchall()
+            return result
+        except Error as err:
+            print(f"Error: '{err}'")
+
+    def read_query(self, query, value):
+        cursor = self.__connection.cursor()
+        result = None
+        try:
+            cursor.execute(query, value)
+            result = cursor.fetchall()
+            return result
+        except Error as err:
+            print(f"Error: '{err}'")
+    def retrieve_all_course_based_on_userid(self, username):
+        query = "SELECT course_name, course_id from course_info where user_id = %s"
+        result = self.read_query(query, (username,))
+        return result
+
+    def retrieve_course_content_based_on_course_id(self, course_id):
+        query = "Select * From course_page WHERE course_id = %s"
+        result = self.read_query(query, (course_id,))
+        return result
+
+    def retrieve_quiz_content_based_on_course_id(self, course_id):
+        query = "Select * From quiz WHERE course_id = %s"
+        result = self.read_query(query, (course_id,))
+        return result
+
+    def retrieve_all_course(self):
+        query = "SELECT course_name, course_id from course_info"
+        result = self.read_query_not_based_on_value(query)
+        return result
+
+class User:
 
     def __init__(self, username=None, password=None, email=None, gender=None, role=None):
-        self.__instructor_id = None
+        self.user_id = None
         self.__username = username
         self.__password = password
         self.__email = email
@@ -53,7 +97,9 @@ class Instructor:
         self.__role = role
         self.db = Database()
         self.connection = self.db.connect_db()
-        self.instructor_info = None
+        self.user_info = None
+
+
 
     def get_username(self):
         return self.__username
@@ -79,8 +125,8 @@ class Instructor:
     def set_role(self, value):
         self.__role = value
 
-    def get_instructor_info(self):
-        return self.instructor_info
+    def get_user_info(self):
+        return self.user_info
     def execute_query(self, query):
         cursor = self.connection.cursor()
         try:
@@ -90,9 +136,9 @@ class Instructor:
         except Error as err:
             print(f"Error: '{err}'")
 
-    def create_intructor_info_table(self):
-        query = ("""create table instructor_info (
-                 instructor_id INT PRIMARY KEY AUTO_INCREMENT,
+    def create_user_info_table(self):
+        query = ("""create table user_info (
+                 user_id INT PRIMARY KEY AUTO_INCREMENT,
                  username VARCHAR(20) NOT NULL,
                  password VARCHAR(20) NOT NULL,
                  email VARCHAR(40) NOT NULL,
@@ -102,8 +148,8 @@ class Instructor:
                  """)
         self.execute_query(query)
 
-    def create_instructor_account(self):
-        query = "INSERT INTO instructor_info (username, password, email, gender, role) VALUES (%s, %s, %s, %s, %s)"
+    def create_user_account(self):
+        query = "INSERT INTO user_info (username, password, email, gender, role) VALUES (%s, %s, %s, %s, %s)"
         print(self.__username)
         print(self.__role)
         values = (self.__username, self.__password, self.__email, self.__gender, self.__role)
@@ -112,16 +158,22 @@ class Instructor:
         self.connection.commit()
 
     def search_by_username(self):
-        query = "SELECT * FROM instructor_info WHERE username = %s"
+        query = "SELECT * FROM user_info WHERE username = %s"
         result = self.read_query(query, (self.__username,))
+        return result
+
+    def search_by_username2(self, username):
+        query = "SELECT * FROM user_info WHERE username = %s"
+        result = self.read_query(query, (username,))
+        print("result = ", result)
         return result
 
     def login_confirmation(self):
         # Construct the query with placeholders
-        query = "SELECT * FROM instructor_info WHERE username = %s AND password = %s"
-        result = self.read_query(query, (self.__username, self.__password))
+        query = "SELECT * FROM user_info WHERE username = %s AND password = %s AND role = %s"
+        result = self.read_query(query, (self.__username, self.__password, self.__role))
         print(result)
-        self.instructor_info = result
+        self.user_info = result
         return result
 
 
@@ -136,14 +188,15 @@ class Instructor:
             print(f"Error: '{err}'")
 
 class Course:
-    def __init__(self, course_name = None, course_create_date = None, instructor_info = None):
+    def __init__(self, course_name = None, course_create_date = None, user_info = None):
         self.course_name = course_name
         self.course_create_date = course_create_date
         self.db = Database()
         self.connection = self.db.connect_db()
-        self.instructor_info = instructor_info
-        self.instructor_id = instructor_info[0]
-        print(self.instructor_info)
+        self.user_info = user_info
+        self.user_details = user_info[0]
+        self.user_id = self.user_details[0]
+        print(self.user_info)
 
 
     def set_course_name(self, course_name):
@@ -172,15 +225,15 @@ class Course:
                  course_id INT PRIMARY KEY AUTO_INCREMENT,
                  course_name VARCHAR(100) NOT NULL,
                  course_create_date DATE NOT NULL,
-                 instructor_id INT,
-                 FOREIGN KEY (instructor_id) REFERENCES instructor_info(instructor_id)
+                 user_id INT,
+                 FOREIGN KEY (user_id) REFERENCES user_info(user_id)
                  );
                  """)
         self.execute_query(query)
 
     def create_course_info(self):
-        query = "INSERT INTO course_info (course_name, course_create_date, instructor_id) VALUES (%s, %s, %s)"
-        values = (self.course_name, self.course_create_date, self.instructor_id)
+        query = "INSERT INTO course_info (course_name, course_create_date, user_id) VALUES (%s, %s, %s)"
+        values = (self.course_name, self.course_create_date, self.user_id)
         cursor = self.connection.cursor()
         cursor.execute(query, values)
         self.connection.commit()
@@ -195,20 +248,38 @@ class Course:
         except Error as err:
             print(f"Error: '{err}'")
 
+    def read_query_not_based_on_value(self, query):
+        cursor = self.connection.cursor()
+        result = None
+        try:
+            cursor.execute(query)
+            result = cursor.fetchall()
+            return result
+        except Error as err:
+            print(f"Error: '{err}'")
+
     def search_by_course_name(self):
         query = "SELECT * FROM course_info WHERE course_name = %s"
         result = self.read_query(query, (self.course_name,))
         return result[0]
+
+    def search_by_course_name2(self):
+        query = "SELECT * FROM course_info WHERE course_name = %s"
+        result = self.read_query(query, (self.course_name,))
+        return result
+
     def clear_table(self):
-        query = "DROP TABLE course_info"
+        query = "Drop TABLE user_info"
         self.execute_query(query)
+
 
 
 class Course_page:
     def __init__(self, course_page_number = None, course_title = None, course_author = None, course_abstract = None, tabview1_subtopic_entry = None, tabview1_data_entry1 = None,
                  tabview1_data_entry2 = None, tabview1_data_entry3 = None, tabview1_textbox = None, tabview2_subtopic_entry = None, tabview2_data_entry1 = None,
                  tabview2_data_entry2 = None, tabview2_data_entry3 = None, tabview2_textbox = None, tabview3_subtopic_entry = None, tabview3_data_entry1 = None,
-                 tabview3_data_entry2 = None, tabview3_data_entry3 = None, tabview3_textbox = None, course_info = None):
+                 tabview3_data_entry2 = None, tabview3_data_entry3 = None, tabview3_textbox = None, img_1 = None,  img_2 = None, img_3 = None,  img_4 = None,
+                 img_5 = None, img_6 = None, img_7 = None, img_8 = None, img_9 = None, course_info = None):
         self.db = Database()
         self.connection = self.db.connect_db()
         self.course_page_number = course_page_number
@@ -230,6 +301,15 @@ class Course_page:
         self.tabview3_data_entry2 = tabview3_data_entry2
         self.tabview3_data_entry3 = tabview3_data_entry3
         self.tabview3_textbox = tabview3_textbox
+        self.img_1 = img_1
+        self.img_2 = img_2
+        self.img_3 = img_3
+        self.img_4 = img_4
+        self.img_5 = img_5
+        self.img_6 = img_6
+        self.img_7 = img_7
+        self.img_8 = img_8
+        self.img_9 = img_9
         self.course_info = course_info
         self.course_id = course_info[0]
 
@@ -305,44 +385,126 @@ class Course_page:
                  tabview3_data_entry2 VARCHAR(20) NOT NULL,
                  tabview3_data_entry3 VARCHAR(20) NOT NULL,
                  tabview3_textbox TEXT NOT NULL,
+                 img_1 VARCHAR(100) NOT NULL,
+                 img_2 VARCHAR(100) NOT NULL,
+                 img_3 VARCHAR(100) NOT NULL,
+                 img_4 VARCHAR(100) NOT NULL,
+                 img_5 VARCHAR(100) NOT NULL,
+                 img_6 VARCHAR(100) NOT NULL,
+                 img_7 VARCHAR(100) NOT NULL,
+                 img_8 VARCHAR(100) NOT NULL,
+                 img_9 VARCHAR(100) NOT NULL,
                  course_id INT,
                  FOREIGN KEY (course_id) REFERENCES course_info(course_id)
                  );
                  """)
         self.execute_query(query)
 
+    def read_query(self, query, value):
+        cursor = self.connection.cursor()
+        result = None
+        try:
+            cursor.execute(query, value)
+            result = cursor.fetchall()
+            return result
+        except Error as err:
+            print(f"Error: '{err}'")
+
+
+
+    def retrieve_img_1(self):
+        query = "SELECT img_1 FROM course_page WHERE course_title = %s"
+        result = self.read_query(query, ("Jay",))
+        return result[0]
+
     def create_course_page_info(self):
-        print(type(self.course_page_number))
-        print(type(self.course_title))
-        print(type(self.course_author))
-        print(type(self.course_abstract))
-        print(type(self.tabview1_subtopic_entry))
-        print(type(self.tabview1_data_entry1))
-        print(type(self.tabview1_data_entry2))
-        print(type(self.tabview1_data_entry3))
-        print(type(self.tabview1_textbox))
-        print(type(self.tabview2_subtopic_entry))
-        print(type(self.tabview2_data_entry1))
-        print(type(self.tabview2_data_entry2))
-        print(type(self.tabview2_data_entry3))
-        print(type(self.tabview2_textbox))
-        print(type(self.tabview3_subtopic_entry))
-        print(type(self.tabview3_data_entry1))
-        print(type(self.tabview3_data_entry2))
-        print(type(self.tabview3_data_entry3))
-        print(type(self.tabview3_textbox))
-        print(self.course_id)
         query = """INSERT INTO course_page (course_page_number, course_title, course_author, course_abstract, tabview1_subtopic_entry, tabview1_data_entry1, tabview1_data_entry2, tabview1_data_entry3, tabview1_textbox, 
                    tabview2_subtopic_entry, tabview2_data_entry1, tabview2_data_entry2, tabview2_data_entry3, tabview2_textbox, 
-                   tabview3_subtopic_entry, tabview3_data_entry1, tabview3_data_entry2, tabview3_data_entry3, tabview3_textbox, course_id) 
-                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+                   tabview3_subtopic_entry, tabview3_data_entry1, tabview3_data_entry2, tabview3_data_entry3, tabview3_textbox, img_1, img_2, img_3, img_4, img_5, img_6, img_7, img_8, img_9, course_id) 
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
         values = (self.course_page_number, self.course_title, self.course_author, self.course_abstract,
                   self.tabview1_subtopic_entry, self.tabview1_data_entry1, self.tabview1_data_entry2, self.tabview1_data_entry3, self.tabview1_textbox,
                   self.tabview2_subtopic_entry, self.tabview2_data_entry1, self.tabview2_data_entry2, self.tabview2_data_entry3, self.tabview2_textbox,
                   self.tabview3_subtopic_entry, self.tabview3_data_entry1, self.tabview3_data_entry2, self.tabview3_data_entry3, self.tabview3_textbox,
+                  self.img_1, self.img_2, self.img_3, self.img_4, self.img_5, self.img_6, self.img_7, self.img_8, self.img_9,
                   self.course_id)
         cursor = self.connection.cursor()
         cursor.execute(query, values)
         self.connection.commit()
+
+class Quiz:
+    def __init__(self, input_type = None, quiz_number = None, quiz_question = None, short_answer_ans = None, radio_choice_1 = None, radio_choice_2 = None, radio_choice_3 = None, radio_choice_4 = None, radio_answer = None, course_info = None):
+        self.db = Database()
+        self.connection = self.db.connect_db()
+        self.input_type = input_type
+        self.quiz_page_number = quiz_number
+        self.quiz_question = quiz_question
+        self.short_answer_ans = short_answer_ans
+        self.radio_choice_1 = radio_choice_1
+        self.radio_choice_2 = radio_choice_2
+        self.radio_choice_3 = radio_choice_3
+        self.radio_choice_4 = radio_choice_4
+        self.radio_answer = radio_answer
+        self.course_info = course_info
+        self.course_id = course_info[0]
+
+    def execute_query(self, query):
+        cursor = self.connection.cursor()
+        try:
+            cursor.execute(query)
+            self.connection.commit()
+            print("Query successful")
+        except Error as err:
+            print(f"Error: '{err}'")
+
+    def create_quiz_table(self):
+        query = ("""create table quiz  (
+                 quiz_id INT PRIMARY KEY AUTO_INCREMENT,
+                 input_type varchar(20) NOT NULL,
+                 quiz_page_number INT NOT NULL,
+                 quiz_question TEXT NOT NULL,
+                 short_answer_ans TEXT NULL,
+                 radio_choice_1 TEXT NULL,
+                 radio_choice_2 TEXT NULL,
+                 radio_choice_3 TEXT NULL,
+                 radio_choice_4 TEXT NULL,
+                 radio_answer TEXT NULL,
+                 course_id INT,
+                 FOREIGN KEY (course_id) REFERENCES course_info(course_id)
+                 );
+                 """)
+        self.execute_query(query)
+
+    def create_quiz_info(self):
+        query = "INSERT INTO quiz (input_type, quiz_page_number, quiz_question, short_answer_ans, radio_choice_1, radio_choice_2, radio_choice_3, radio_choice_4, radio_answer, course_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        values = (self.input_type, self.quiz_page_number, self.quiz_question, self.short_answer_ans, self.radio_choice_1, self.radio_choice_2, self.radio_choice_3, self.radio_choice_4, self.radio_answer, self.course_id)
+        cursor = self.connection.cursor()
+        cursor.execute(query, values)
+        self.connection.commit()
+
+    def read_query(self, query, value):
+        cursor = self.connection.cursor()
+        result = None
+        try:
+            cursor.execute(query, value)
+            result = cursor.fetchall()
+            return result
+        except Error as err:
+            print(f"Error: '{err}'")
+
+    # def search_by_course_name(self):
+    #     query = "SELECT * FROM course_info WHERE course_name = %s"
+    #     result = self.read_query(query, (self.course_name,))
+    #     return result[0]
+    # def clear_table(self):
+    #     query = "DROP TABLE course_info"
+    #     self.execute_query(query)
+
+
+# course = Course_page()
+#
+# quiz = Quiz()
+# quiz.create_quiz_table()
+
 
 
